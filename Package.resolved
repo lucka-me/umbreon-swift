@@ -1,0 +1,60 @@
+{
+  "originHash" : "71fb4c3dfe3c57ed34d76ed77a92d752034c7c099d3e0e77d1c38c812ea2bc26",
+  "pins" : [
+    {
+      "identity" : "mapbox-common-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-common-ios.git",
+      "state" : {
+        "revision" : "72b91a2d529eeb530bac9d4f9188a0f7dac45f6d",
+        "version" : "24.15.1"
+      }
+    },
+    {
+      "identity" : "mapbox-core-maps-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-core-maps-ios.git",
+      "state" : {
+        "revision" : "4ee72ff64a3eeb81b1596e9d1d2e7965c313913e",
+        "version" : "11.15.1"
+      }
+    },
+    {
+      "identity" : "mapbox-maps-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/mapbox-maps-ios.git",
+      "state" : {
+        "revision" : "793d02df47d65d65d42ed9211130fc388b7a7dc0",
+        "version" : "11.15.1"
+      }
+    },
+    {
+      "identity" : "sphere-geometry-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lucka-me/sphere-geometry-swift.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a5fd8160635c2212754cf4b8fb312a1ca2efb5bc"
+      }
+    },
+    {
+      "identity" : "turf-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mapbox/turf-swift.git",
+      "state" : {
+        "revision" : "bf840e6b9529d105687840fe2c9dcd74197d46d1",
+        "version" : "4.0.0"
+      }
+    },
+    {
+      "identity" : "zipfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/weichsel/ZIPFoundation.git",
+      "state" : {
+        "revision" : "22787ffb59de99e5dc1fbfe80b19c97a904ad48d",
+        "version" : "0.9.20"
+      }
+    }
+  ],
+  "version" : 3
+}
