@@ -15,7 +15,7 @@ import MapKit
 
 final class BaseMapAppearanceDefaults : ObservableObject {
     @AppStorage("BaseMapAppearance.Style")
-    var style = Style.standard
+    var style = Style.satellite
     
 #if canImport(MapboxMaps)
     @AppStorage("BaseMapAppearance.LightPreset")
