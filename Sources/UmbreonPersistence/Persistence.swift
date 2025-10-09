@@ -90,8 +90,8 @@ public extension Persistence {
         return (totalArea, insertedCells)
     }
     
-    func refreshStatistics(reporting progress: Progress) async throws {
-        progress.totalUnitCount = 3
+    func refreshStatistics(reporting progress: Progress? = nil) async throws {
+        progress?.totalUnitCount = 3
         
         try resetStatistics()
         
@@ -100,20 +100,20 @@ public extension Persistence {
         // Union all cells
         var fetchDescriptor = FetchDescriptor<PartialCellCollection>()
         fetchDescriptor.propertiesToFetch = [ \.detailedCellsData ]
-        let unionProgress = progress
+        let unionProgress = progress?
             .addChild(for: .init(try modelContext.fetchCount(fetchDescriptor)), as: 1)
         var cells = CellCollection()
         try modelContext.enumerate(fetchDescriptor) { collection in
             cells.formUnion(collection.detailedCells)
-            unionProgress.completedUnitCount += 1
+            unionProgress?.completedUnitCount += 1
         }
         
         // Group
         let groupedCells = await tessellation
-            .group(cells: cells, reporting: progress.addChild(as: 1))
+            .group(cells: cells, reporting: progress?.addChild(as: 1))
         
         // Insert areas
-        let _ = try insert(accumulating: groupedCells, reporting: progress.addChild(as: 1))
+        let _ = try insert(accumulating: groupedCells, reporting: progress?.addChild(as: 1))
     }
 }
 
