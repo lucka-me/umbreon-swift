@@ -175,12 +175,17 @@ fileprivate extension Persistence {
     }
     
     func insert(discoveredArea: Double, to regionCode: RegionCode) throws {
-        if let item = try modelContext.first(matches: .region(matches: regionCode)) {
-            item.addDiscoveredArea(discoveredArea)
-        } else {
-            modelContext.insert(
-                RegionStatistic(regionCode: regionCode, discoveredArea: discoveredArea)
+        if let model = try modelContext.first(matches: .region(matches: regionCode)) {
+            model.addDiscoveredArea(discoveredArea)
+        } else if
+            let model = try RegionStatistic(
+                regionCode: regionCode,
+                discoveredArea: discoveredArea
             )
+        {
+            modelContext.insert(model)
+        } else {
+            // The Region entry should always exists.
         }
     }
     

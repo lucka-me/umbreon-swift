@@ -14,9 +14,3 @@ public extension RegionReferencable {
         RegionProvider.shared[regionCode]
     }
 }
-
-public extension RegionReferencable where Self : DiscoveryMeasurable {
-    var discoveryProgress: Double {
-        discoveredArea / region.area
-    }
-}
