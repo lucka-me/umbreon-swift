@@ -49,6 +49,7 @@ public extension RegionStatistic {
     func resetDiscoveredArea() {
         self.discoveredArea = 0
         self.discoveredProportion = 0
+        self.area = self.region.area
     }
 }
 
