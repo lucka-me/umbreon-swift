@@ -40,7 +40,7 @@ public extension Persistence {
 }
 
 public extension Persistence {
-    typealias InsertResult = (area: Measurement<UnitArea>, cells: CellCollection)
+    typealias InsertResult = (area: Double, cells: CellCollection)
     
     @discardableResult
     func insert(
@@ -76,7 +76,7 @@ public extension Persistence {
         }
         
         guard !insertedCells.isEmpty else {
-            return (.init(value: .zero, unit: .squareKilometers), insertedCells)
+            return (.zero, .init())
         }
         
         let groupedCells = await tessellation.group(
@@ -151,7 +151,7 @@ fileprivate extension Persistence {
     func insert(
         accumulating cells: [ RegionCode : CellCollection ],
         reporting progress: Progress? = nil
-    ) throws -> Measurement<UnitArea> {
+    ) throws -> Double {
         progress?.totalUnitCount = Int64(cells.count) * 2 + 1
         
         let totalArea: Double = try cells
@@ -171,7 +171,7 @@ fileprivate extension Persistence {
         try insert(discoveredArea: totalArea, to: .world)
         progress?.completedUnitCount += 1
         
-        return .init(value: totalArea, unit: .squareMeters)
+        return totalArea
     }
     
     func insert(discoveredArea: Double, to regionCode: RegionCode) throws {
