@@ -29,11 +29,13 @@ public final class PartialCellCollection {
 }
 
 public extension PartialCellCollection {
+    // 16 - 1 = 3 + 6 * 2, precisely fits level 6
+    // NOTICE: For SwiftData, UInt16 will be *wrapped* to Int16 when persisted, resulted in
+    // nagative integer in america and south, and unable to be fetched with predicate, so we leave
+    // the leading bit (sign bit for Int16) as 0 to keep the identifier and order of models.
     typealias InstanceIdentifier = UInt16
     
     static let instanceLevel = Level.at.6
-    static let coarseLevel = Level.at.12
-    static let detailedLevel = Level.at.20
     
     static func instanceIdentifier(of cell: CellIdentifier) -> InstanceIdentifier {
         instanceIdentifier(of: cell.rawValue)
@@ -43,16 +45,31 @@ public extension PartialCellCollection {
         .init(value >> Self.instanceIdentifierOffset)
     }
     
+    var instanceCell: CellIdentifier {
+        .init(
+            rawValue: (.init(instanceIdentifier) << Self.instanceIdentifierOffset) |
+                Self.instanceIdentifierLeastSignificantBit
+        )!
+    }
+    
+    func updateInstanceCell() {
+        guard let cell = coarseCells.first ?? detailedCells.first else {
+            return
+        }
+        self.instanceIdentifier = Self.instanceIdentifier(of: cell)
+    }
+}
+
+public extension PartialCellCollection {
+    static let coarseLevel = Level.at.12
+    static let detailedLevel = Level.at.20
+    
     var coarseCells: CellCollection {
         .init(data: coarseCellsData) ?? .init()
     }
     
     var detailedCells: CellCollection {
         .init(data: detailedCellsData) ?? .init()
-    }
-    
-    var instanceCell: CellIdentifier {
-        .init(rawValue: .init(instanceIdentifier) << Self.instanceIdentifierOffset)!
     }
     
     func assign(_ cells: CellCollection) {
@@ -69,7 +86,8 @@ public extension PartialCellCollection {
 }
 
 fileprivate extension PartialCellCollection {
-    static let totalBitCount = MemoryLayout<CellIdentifier.RawValue>.size * 8
-    static let instanceIdentifierBitCount = MemoryLayout<InstanceIdentifier>.size * 8   // 16 = 3 + 6 * 2 + 1, precisely fits level 6
-    static let instanceIdentifierOffset = totalBitCount - instanceIdentifierBitCount
+    static let cellIdentifierBitCount = MemoryLayout<CellIdentifier.RawValue>.size * 8
+    static let instanceIdentifierBitCount = MemoryLayout<InstanceIdentifier>.size * 8 - 1
+    static let instanceIdentifierOffset = cellIdentifierBitCount - instanceIdentifierBitCount
+    static let instanceIdentifierLeastSignificantBit: CellIdentifier.RawValue = 1 << (instanceIdentifierOffset - 1)
 }
