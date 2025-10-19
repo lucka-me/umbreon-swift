@@ -4,6 +4,14 @@
 
 Core components of Umbra Sphere.
 
+## About Umbra Sphere
+
+Umbra Sphere is a [proof-of-concept](https://en.wikipedia.org/wiki/Proof_of_concept) where we try to implement a [Fog-of-World](https://fogofworld.app)-like app with [S2 Geometry](https://github.com/google/s2geometry) as underlying technology.
+
+Umbra Sphere is still under development, you may join the TestFlight [here](https://testflight.apple.com/join/PcmWvqUC).
+
+Umbra Sphere will not be fully open-sourced, but we hope to open-source more core components to this repository when they are stable enough.
+
 ## At a Glance
 
 ### Target [`UmbreonCore`](Sources/UmbreonCore)
@@ -33,17 +41,13 @@ This target provides UI components of Umbra Sphere App.
   - [`UmbraProvider/Dataset`](Sources/UmbreonAppUI/UmbraMap/UmbraProvider/Dataset): Interfaces to supply cells to `UmbraMap`
 - [`SphereGeometryDemoMap`](Sources/UmbreonAppUI/SphereGeometryDemoMap): Component to display cell on map
 
-## About Umbra Sphere
-
-Umbra Sphere is a [proof-of-concept](https://en.wikipedia.org/wiki/Proof_of_concept) where we try to implement a [Fog-of-World](https://fogofworld.app)-like app with [S2 Geometry](https://github.com/google/s2geometry) as underlying technology.
-
-Umbra Sphere is still under development, you may join the TestFlight [here](https://testflight.apple.com/join/PcmWvqUC).
-
-Umbra Sphere will not be fully open-sourced, but we hope to open-source more core components to this repository when they are stable enough.
-
 ## Usage
 
 To use the package in a SwiftPM project, add `https://github.com/lucka-me/umbreon-swift` to the dependencies of your package and target.
+
+### Mapbox Tokens
+
+[Mapbox Maps SDK for iOS](https://github.com/mapbox/mapbox-maps-ios) is dependency of `UmbreonAppUI`, you need to setup download token and public token, please refer to the [official document](https://docs.mapbox.com/ios/maps/guides/install/#part-1-create-and-configure-your-credentials).
 
 ### Download Generated Resources
 
@@ -86,7 +90,7 @@ struct ContentView : View {
                     ) { @Sendable cells in
                         // Insert discovered cells to database
                         let inserted = try await persistence.insert(discovered: cells)
-                        if inserted.area.value > .zero {
+                        if !inserted.cells.isEmpty {
                             try await persistence.save()
                             // Notify the UmbraMap to update
                             await PersistentUmbraDataset.updated(inserted.cells)

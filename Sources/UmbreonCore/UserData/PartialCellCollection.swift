@@ -51,13 +51,6 @@ public extension PartialCellCollection {
                 Self.instanceIdentifierLeastSignificantBit
         )!
     }
-    
-    func updateInstanceCell() {
-        guard let cell = coarseCells.first ?? detailedCells.first else {
-            return
-        }
-        self.instanceIdentifier = Self.instanceIdentifier(of: cell)
-    }
 }
 
 public extension PartialCellCollection {
