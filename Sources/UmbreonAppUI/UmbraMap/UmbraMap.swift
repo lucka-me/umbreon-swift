@@ -20,6 +20,7 @@ public struct UmbraMap : View {
     @Binding private var cameraProposal: MapCameraProposal
     
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
     
     @State private var context = Context()
     @State private var datasetUpdate = UmbraDataset.UpdateSubject()
@@ -48,9 +49,10 @@ public struct UmbraMap : View {
             .onAppear(perform: setupView)
             .onChange(of: cameraProposal, handleCameraProposal)
             .onChange(of: viewport, handleViewport)
+            .onChange(of: scenePhase, handleScenePhaseChanged)
             .onDisappear(perform: terminate)
             .task(priority: .high, viewTask)
-            .onReceive(datasetUpdate, perform: context.requestUpdate(in:))
+            .onReceive(datasetUpdate, perform: handleDatasetUpdated(in:))
     }
 }
     
@@ -158,10 +160,6 @@ fileprivate extension UmbraMap {
         let provider = UmbraProvider(dataset: dataset)
         
         for await request in requests {
-            guard let request else {
-                break
-            }
-            
             do {
                 guard try await provider.request(request) else {
                     continue
@@ -199,6 +197,16 @@ fileprivate extension UmbraMap {
 #endif
     }
     
+    private func handleDatasetUpdated(in cells: CellCollection) {
+        context.handleDatasetModified(in: cells, active: scenePhase == .active)
+    }
+    
+    private func handleScenePhaseChanged() {
+        if scenePhase == .active {
+            context.handleSceneActivated()
+        }
+    }
+    
     private func handleViewport() {
         if viewport.isIdle, !cameraProposal.isReportedByMap {
             // Be triggered by user panning
@@ -219,14 +227,15 @@ fileprivate extension UmbraMap {
 }
 
 fileprivate final class Context {
-    typealias Request = UmbraProvider.Request
-    typealias Requests = AsyncStream<Request?>
+    typealias Requests = AsyncStream<UmbraProvider.Request>
     
     let requests: Requests
     
     private(set) var latestCamera: CameraState? = nil
     
     private let continuation: Requests.Continuation
+    
+    private var pendingUpdates = CellCollection()
     
     init() {
         let (stream, continuation) = Requests.makeStream(bufferingPolicy: .bufferingNewest(1))
@@ -258,12 +267,33 @@ fileprivate final class Context {
     }
 #endif
     
-    func requestUpdate(in cells: CellCollection) {
-        continuation.yield(.datasetInserted(cells: cells))
+    func handleDatasetModified(in cells: CellCollection, active: Bool) {
+        guard !cells.isEmpty else {
+            continuation.yield(.datasetUpdated(cells: cells))
+            pendingUpdates = .init()
+            return
+        }
+        
+        if active {
+            continuation.yield(.datasetUpdated(cells: cells.union(pendingUpdates)))
+            if !pendingUpdates.isEmpty {
+                pendingUpdates = .init()
+            }
+        } else {
+            pendingUpdates.formUnion(cells)
+        }
+    }
+    
+    func handleSceneActivated() {
+        guard !pendingUpdates.isEmpty else {
+            return
+        }
+        
+        continuation.yield(.datasetUpdated(cells: pendingUpdates))
+        pendingUpdates = .init()
     }
     
     func terminate() {
-        continuation.yield(nil)
         continuation.finish()
     }
 }
