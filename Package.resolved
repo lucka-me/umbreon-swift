@@ -1,13 +1,13 @@
 {
-  "originHash" : "71fb4c3dfe3c57ed34d76ed77a92d752034c7c099d3e0e77d1c38c812ea2bc26",
+  "originHash" : "13432179e8f595d8de6b6b6231d7d6ef33bcfece35da2651b709956dd8e6d002",
   "pins" : [
     {
       "identity" : "mapbox-common-ios",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mapbox/mapbox-common-ios.git",
       "state" : {
-        "revision" : "72b91a2d529eeb530bac9d4f9188a0f7dac45f6d",
-        "version" : "24.15.1"
+        "revision" : "a1918c123344e81274b7d86cb6ceea4d9cd63dd8",
+        "version" : "24.16.2"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mapbox/mapbox-core-maps-ios.git",
       "state" : {
-        "revision" : "4ee72ff64a3eeb81b1596e9d1d2e7965c313913e",
-        "version" : "11.15.1"
+        "revision" : "02b9bdd752ccc4dbc78c8385fa2d51f3484e6ba5",
+        "version" : "11.16.2"
       }
     },
     {
@@ -24,8 +24,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mapbox/mapbox-maps-ios.git",
       "state" : {
-        "revision" : "793d02df47d65d65d42ed9211130fc388b7a7dc0",
-        "version" : "11.15.1"
+        "revision" : "fbe87c9a5b8d21ebf3c8967200848a2204ace2ac",
+        "version" : "11.16.2"
       }
     },
     {
@@ -34,7 +34,7 @@
       "location" : "https://github.com/lucka-me/sphere-geometry-swift.git",
       "state" : {
         "branch" : "main",
-        "revision" : "a5fd8160635c2212754cf4b8fb312a1ca2efb5bc"
+        "revision" : "a9db482d988e827a896402bdc92388600ab1b485"
       }
     },
     {
