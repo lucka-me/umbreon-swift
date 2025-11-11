@@ -8,7 +8,9 @@ Core components of Umbra Sphere.
 
 Umbra Sphere is a [proof-of-concept](https://en.wikipedia.org/wiki/Proof_of_concept) where we try to implement a [Fog-of-World](https://fogofworld.app)-like app with [S2 Geometry](https://github.com/google/s2geometry) as underlying technology.
 
-Umbra Sphere is still under development, you may join the TestFlight [here](https://testflight.apple.com/join/PcmWvqUC).
+Umbra Sphere is now available on App Store.
+
+[![](https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us)](https://apps.apple.com/app/id6753129532)
 
 Umbra Sphere will not be fully open-sourced, but we hope to open-source more core components to this repository when they are stable enough.
 
