@@ -368,7 +368,7 @@ fileprivate extension MapCameraUpdateContext {
         
         let east: LocationDegrees
         let west: LocationDegrees
-        if span.longitudeDelta < 180 {
+        if span.longitudeDelta < 120 {
             east = center.longitude + span.longitudeDelta
             west = center.longitude - span.longitudeDelta
         } else {
