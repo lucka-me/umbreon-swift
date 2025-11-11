@@ -34,14 +34,14 @@ extension UmbraProvider {
     
     enum Request : Sendable {
         case camaraChanged(range: RequestRange, resolution: Level)
-        case datasetInserted(cells: CellCollection)
+        case datasetUpdated(cells: CellCollection)
     }
     
     func request(_ request: Request) async throws -> Bool {
         switch request {
         case .camaraChanged(let range, let resolution):
             try await self.request(in: range, at: resolution)
-        case .datasetInserted(let cells):
+        case .datasetUpdated(let cells):
             try await self.request(checking: cells)
         }
     }
