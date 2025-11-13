@@ -24,7 +24,7 @@ public struct UmbraMap : View {
     
     @State private var context = Context()
     @State private var datasetUpdate = UmbraDataset.UpdateSubject()
-    @State private var viewport = Viewport.idle
+    @State private var viewport = Viewport.default
     
     @State private var umbra = PlottablePolygon.world
     
@@ -135,10 +135,10 @@ fileprivate extension UmbraMap {
 
 fileprivate extension UmbraMap {
     func setupView() {
-        guard !cameraProposal.isReportedByMap else {
+        guard !cameraProposal.positionedByUser else {
             return
         }
-        self.viewport = cameraProposal.viewport(currentZoom: nil)
+        self.viewport = cameraProposal.viewport(currentCamera: nil)
     }
     
     func terminate() {
@@ -182,10 +182,10 @@ fileprivate extension UmbraMap {
 
 fileprivate extension UmbraMap {
     private func handleCameraProposal() {
-        guard !cameraProposal.isReportedByMap else {
+        guard !cameraProposal.positionedByUser else {
             return
         }
-        let viewport = cameraProposal.viewport(currentZoom: context.latestCamera?.zoom)
+        let viewport = cameraProposal.viewport(currentCamera: context.latestCamera)
 #if canImport(MapboxMaps)
         withViewportAnimation(.fly) {
             self.viewport = viewport
@@ -208,9 +208,9 @@ fileprivate extension UmbraMap {
     }
     
     private func handleViewport() {
-        if viewport.isIdle, !cameraProposal.isReportedByMap {
+        if viewport.isIdle, !cameraProposal.positionedByUser {
             // Be triggered by user panning
-            cameraProposal = .pannedByUser
+            cameraProposal = .positionedByUser
         }
     }
 }

@@ -15,9 +15,9 @@ import Turf
 #endif
 
 public struct MapCameraProposal {
-    public let isReportedByMap: Bool
+    public let positionedByUser: Bool
     
-    public let followUser: Bool
+    public let followsUser: Bool
     
     let center: LocationCoordinate2D?
     let verticalPosition: Double?
@@ -25,14 +25,14 @@ public struct MapCameraProposal {
     let boundingBox: BoundingBox?
     
     init(
-        isReportedByMap: Bool,
-        followUser: Bool = false,
+        positionedByUser: Bool,
+        followsUser: Bool = false,
         center: LocationCoordinate2D? = nil,
         verticalPosition: Double? = nil,
         boundingBox: BoundingBox? = nil
     ) {
-        self.isReportedByMap = isReportedByMap
-        self.followUser = followUser
+        self.positionedByUser = positionedByUser
+        self.followsUser = followsUser
         self.center = center
         self.verticalPosition = verticalPosition
         self.boundingBox = boundingBox
@@ -40,35 +40,37 @@ public struct MapCameraProposal {
 }
 
 public extension MapCameraProposal {
-    static var followUser: Self {
-        .init(isReportedByMap: false, followUser: true)
-    }
-    
     static var idle: Self {
-        .init(isReportedByMap: false)
+        .init(positionedByUser: false)
     }
     
     static func camera(center: LocationCoordinate2D, verticalPosition: Double) -> Self {
         .init(
-            isReportedByMap: false,
-            center: center,
-            verticalPosition: verticalPosition
-        )
-    }
-    
-    static func followUserWithFallback(
-        center: LocationCoordinate2D, verticalPosition: Double
-    ) -> Self {
-        .init(
-            isReportedByMap: false,
-            followUser: true,
+            positionedByUser: false,
             center: center,
             verticalPosition: verticalPosition
         )
     }
     
     static func overview(boundingBox: BoundingBox) -> Self {
-        .init(isReportedByMap: false, boundingBox: boundingBox)
+        .init(positionedByUser: false, boundingBox: boundingBox)
+    }
+}
+
+public extension MapCameraProposal {
+    static var followsUser: Self {
+        .init(positionedByUser: false, followsUser: true)
+    }
+    
+    static func followsUserWithFallback(
+        center: LocationCoordinate2D, verticalPosition: Double
+    ) -> Self {
+        .init(
+            positionedByUser: false,
+            followsUser: true,
+            center: center,
+            verticalPosition: verticalPosition
+        )
     }
 }
 
@@ -77,57 +79,34 @@ extension MapCameraProposal : Equatable, Sendable {
 }
 
 extension MapCameraProposal {
-    static var pannedByUser: Self {
-        .init(isReportedByMap: true)
+    static var positionedByUser: Self {
+        .init(positionedByUser: true)
     }
+}
     
-    func viewport(currentZoom: CGFloat?) -> Viewport {
-        if let boundingBox {
+extension MapCameraProposal {
 #if canImport(MapboxMaps)
-            .overview(
-                geometry: LineString([ boundingBox.southWest, boundingBox.northEast ]),
-                geometryPadding: .init(top: 40, leading: 6, bottom: 40, trailing: 6)
+    static let defaultVerticalPosition = Viewport.followsUserMinZoom
+#else
+    static let defaultVerticalPosition = Viewport.followsUserMaxDistance
+#endif
+    
+    func viewport(currentCamera: CameraState?) -> Viewport {
+        let verticalPosition = verticalPosition ??
+            currentCamera?.verticalPosition ??
+            Self.defaultVerticalPosition
+        
+        return if let boundingBox {
+            .overview(boundingBox: boundingBox)
+        } else if followsUser {
+            .followsUser(
+                fallback: center ?? currentCamera?.center,
+                verticalPosition: verticalPosition
             )
-#else
-            .region(boundingBox.coordinateRegion)
-#endif
-        } else if followUser {
-#if canImport(MapboxMaps)
-            .followPuck(zoom: verticalPosition ?? currentZoom ?? 16)
-#else
-            if let center, let verticalPosition {
-                .userLocation(
-                    fallback: .camera(center: center, verticalPosition: verticalPosition)
-                )
-            } else {
-                .userLocation(fallback: .automatic)
-            }
-#endif
-        } else if let center, let verticalPosition {
+        } else if let center {
             .camera(center: center, verticalPosition: verticalPosition)
         } else {
-            .idle
+            .idle(at: currentCamera)
         }
     }
 }
-
-#if !canImport(MapboxMaps)
-fileprivate extension BoundingBox {
-    var coordinateRegion: MKCoordinateRegion {
-        var center = CLLocationCoordinate2D(
-            latitude: (northEast.latitude + southWest.latitude) / 2,
-            longitude: (northEast.longitude + southWest.longitude) / 2
-        )
-        var span = MKCoordinateSpan(
-            latitudeDelta: northEast.latitude - southWest.latitude,
-            longitudeDelta: northEast.longitude - southWest.longitude
-        )
-        if northEast.longitude < southWest.longitude {
-            center.longitude += 180
-            span.longitudeDelta += 360
-        }
-        
-        return .init(center: center, span: span)
-    }
-}
-#endif

@@ -21,7 +21,7 @@ public struct SphereGeometryDemoMap : View {
     
     @Environment(\.colorScheme) private var colorScheme
     
-    @State private var viewport = Viewport.idle
+    @State private var viewport = Viewport.default
     @State private var cellPolygon = PlottablePolygon.world
     
     @StateObject private var baseMapDefaults = BaseMapAppearanceDefaults.shared
