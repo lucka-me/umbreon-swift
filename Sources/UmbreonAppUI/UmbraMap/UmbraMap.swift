@@ -33,6 +33,7 @@ public struct UmbraMap : View {
     
     private let makeDataset: @Sendable () -> UmbraDataset
     
+    private var additionalSafeAreaInsets = EdgeInsets()
     private var showControls: Bool = true
     private var showPuck: Bool = false
     private var storeCamera: ((CLLocationCoordinate2D, Double) -> Void)? = nil
@@ -58,6 +59,10 @@ public struct UmbraMap : View {
 }
 
 public extension UmbraMap {
+    func additionalSafeAreaInsets(_ insets: EdgeInsets) -> Self {
+        copy(assigning: \.additionalSafeAreaInsets, to: insets)
+    }
+    
     func onCameraDisappear(
         perform action: @escaping (CLLocationCoordinate2D, Double) -> Void
     ) -> Self {
@@ -100,6 +105,7 @@ fileprivate extension UmbraMap {
                     compass: .init(visibility: showControls ? .adaptive : .hidden)
                 )
             )
+            .additionalSafeAreaInsets(additionalSafeAreaInsets)
             .onCameraChanged { event in
                 guard
                     let map = proxy.map,
@@ -142,6 +148,7 @@ fileprivate extension UmbraMap {
             }
             context.handleCameraChanged(update)
         }
+        .safeAreaPadding(additionalSafeAreaInsets)
     }
 }
 #endif

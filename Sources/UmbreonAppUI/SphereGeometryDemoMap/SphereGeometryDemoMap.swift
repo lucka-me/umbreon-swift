@@ -27,6 +27,7 @@ public struct SphereGeometryDemoMap : View {
     @StateObject private var baseMapDefaults = BaseMapAppearanceDefaults.shared
     @StateObject private var umbraDefaults = UmbraAppearanceDefaults.shared
     
+    private var additionalSafeAreaInsets = EdgeInsets()
     private var followCamera: Bool = false
     
     public init(_ value: Binding<CellIdentifier>) {
@@ -40,6 +41,10 @@ public struct SphereGeometryDemoMap : View {
 }
 
 public extension SphereGeometryDemoMap {
+    func additionalSafeAreaInsets(_ insets: EdgeInsets) -> Self {
+        copy(assigning: \.additionalSafeAreaInsets, to: insets)
+    }
+    
     func followCamera(
         _ follow: Bool
     ) -> Self {
@@ -59,6 +64,7 @@ fileprivate extension SphereGeometryDemoMap {
         }
         .cameraBounds(.init(maxPitch: 0, minPitch: 0))
         .mapStyle(baseMapDefaults.resolvedMapStyle(in: colorScheme))
+        .additionalSafeAreaInsets(additionalSafeAreaInsets)
         .onCameraChanged { event in
             handleCameraChanged(event.cameraState.center)
         }
@@ -80,6 +86,7 @@ fileprivate extension SphereGeometryDemoMap {
         .onMapCameraChange(frequency: .continuous) { event in
             handleCameraChanged(event.camera.centerCoordinate)
         }
+        .safeAreaPadding(additionalSafeAreaInsets)
     }
 }
 #endif
