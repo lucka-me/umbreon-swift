@@ -121,7 +121,7 @@ fileprivate extension UmbraMap {
 fileprivate extension UmbraMap {
     @ViewBuilder
     private var mapContent: some View {
-        Map(position: $viewport) {
+        Map(position: $viewport, interactionModes: [ .pan, .rotate, .zoom ]) {
             if showPuck {
                 UserAnnotation()
             }
