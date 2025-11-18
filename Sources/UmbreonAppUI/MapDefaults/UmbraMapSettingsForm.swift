@@ -25,6 +25,7 @@ public struct UmbraMapSettingsForm : View {
             Section(.init("UmbraMapSettingsForm.Preview.Title", bundle: #bundle)) {
                 // TODO: Generate some example cells
                 UmbraMap(dataset: .cached(cells: [ ]))
+                    .showControls(false)
                     .frame(height: 240)
                     .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
             }

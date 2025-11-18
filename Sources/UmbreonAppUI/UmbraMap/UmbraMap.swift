@@ -33,6 +33,7 @@ public struct UmbraMap : View {
     
     private let makeDataset: @Sendable () -> UmbraDataset
     
+    private var showControls: Bool = true
     private var showPuck: Bool = false
     private var storeCamera: ((CLLocationCoordinate2D, Double) -> Void)? = nil
     
@@ -55,12 +56,16 @@ public struct UmbraMap : View {
             .onReceive(datasetUpdate, perform: handleDatasetUpdated(in:))
     }
 }
-    
+
 public extension UmbraMap {
     func onCameraDisappear(
         perform action: @escaping (CLLocationCoordinate2D, Double) -> Void
     ) -> Self {
         copy(assigning: \.storeCamera, to: action)
+    }
+    
+    func showControls(_ show: Bool) -> Self {
+        copy(assigning: \.showControls, to: show)
     }
     
     func showPuck(_ show: Bool) -> Self {
@@ -89,6 +94,12 @@ fileprivate extension UmbraMap {
             }
             .cameraBounds(.init(maxPitch: 0, minPitch: 0))
             .mapStyle(baseMapDefaults.resolvedMapStyle(in: colorScheme))
+            .ornamentOptions(
+                .init(
+                    scaleBar: .init(visibility: showControls ? .adaptive : .hidden),
+                    compass: .init(visibility: showControls ? .adaptive : .hidden)
+                )
+            )
             .onCameraChanged { event in
                 guard
                     let map = proxy.map,
@@ -119,8 +130,10 @@ fileprivate extension UmbraMap {
                 .foregroundStyle(umbraDefaults.color(in: colorScheme))
         }
         .mapControls {
-            MapScaleView()
-            MapCompass()
+            if showControls {
+                MapScaleView()
+                MapCompass()
+            }
         }
         .mapStyle(baseMapDefaults.resolvedMapStyle(in: colorScheme))
         .onMapCameraChange(frequency: .continuous) { update in
