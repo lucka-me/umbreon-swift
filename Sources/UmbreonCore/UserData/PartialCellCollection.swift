@@ -21,10 +21,10 @@ public final class PartialCellCollection {
     @Attribute(.externalStorage)
     public private(set) var detailedCellsData: Data
     
-    public init(cell: CellIdentifier, children: CellCollection) {
-        self.instanceIdentifier = Self.instanceIdentifier(of: cell)
-        self.coarseCellsData = children.expand(to: Self.coarseLevel).data
-        self.detailedCellsData = children.data
+    public init(cells: CellCollection) {
+        self.instanceIdentifier = Self.instanceIdentifier(of: cells[0])
+        self.coarseCellsData = cells.expand(to: Self.coarseLevel).data
+        self.detailedCellsData = cells.data
     }
 }
 
