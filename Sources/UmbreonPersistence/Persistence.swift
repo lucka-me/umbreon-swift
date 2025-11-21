@@ -91,29 +91,21 @@ public extension Persistence {
     }
     
     func refreshStatistics(reporting progress: Progress? = nil) async throws {
-        progress?.totalUnitCount = 3
+        let identifiers = try modelContext.fetchIdentifiers(
+            FetchDescriptor<PartialCellCollection>()
+        )
+        progress?.totalUnitCount = .init(identifiers.count) * 2
         
         try resetStatistics()
         
-        // TODO: Enumerate and classify?
-        
-        // Union all cells
-        var fetchDescriptor = FetchDescriptor<PartialCellCollection>()
-        fetchDescriptor.propertiesToFetch = [ \.detailedCellsData ]
-        let unionProgress = progress?
-            .addChild(for: .init(try modelContext.fetchCount(fetchDescriptor)), as: 1)
-        var cells = CellCollection()
-        try modelContext.enumerate(fetchDescriptor) { collection in
-            cells.formUnion(collection.detailedCells)
-            unionProgress?.completedUnitCount += 1
+        try await withThrowingTaskGroup { group in
+            for identifier in identifiers {
+                group.addTask { [ weak self ] in
+                    try await self?.refreshStatistics(for: identifier, reporting: progress)
+                }
+            }
+            try await group.waitForAll()
         }
-        
-        // Group
-        let groupedCells = await tessellation
-            .group(cells: cells, reporting: progress?.addChild(as: 1))
-        
-        // Insert areas
-        let _ = try insert(accumulating: groupedCells, reporting: progress?.addChild(as: 1))
     }
 }
 
@@ -148,6 +140,28 @@ fileprivate extension Persistence {
 }
 
 fileprivate extension Persistence {
+    func refreshStatistics(
+        for identifier: PersistentIdentifier,
+        reporting progress: Progress?
+    ) async throws {
+        guard let model = modelContext.model(for: identifier) as? PartialCellCollection else {
+            // TODO: Throw an error?
+            return
+        }
+        
+        let groupedCells = await tessellation.group(
+            cells: model.detailedCells,
+            reporting: progress?.addChild(as: 1)
+        )
+        try insert(
+            accumulating: groupedCells,
+            reporting: progress?.addChild(as: 1)
+        )
+    }
+}
+
+fileprivate extension Persistence {
+    @discardableResult
     func insert(
         accumulating cells: [ RegionCode : CellCollection ],
         reporting progress: Progress? = nil
