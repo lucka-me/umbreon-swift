@@ -12,12 +12,12 @@ import SwiftData
 public class RegionStatistic {
     public var visible: Bool = true
     
+    public private(set) var countryCode: String
+    public private(set) var subdivisionCode: String?
+    
     public private(set) var area: Double = 0
     public private(set) var discoveredArea: Double
     public private(set) var discoveredProportion: Double = 0
-    
-    private(set) var countryCode: String
-    private(set) var subdivisionCode: String?
     
     public init(region: Region, discoveredArea: Double) {
         let code = region.code

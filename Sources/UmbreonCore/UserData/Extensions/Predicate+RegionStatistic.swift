@@ -8,6 +8,10 @@
 import Foundation
 
 public extension Predicate<RegionStatistic> {
+    static var all: RegionStatisticPredicateBuilder {
+        .init(base: .true)
+    }
+    
     static var countries: RegionStatisticPredicateBuilder {
         .init(base: #Predicate { $0.subdivisionCode == nil })
     }
